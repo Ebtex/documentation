@@ -1,0 +1,2994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EveryX API Documentation</title>
+<style>
+:root {
+    --bg: #fff; --fg: #1a1a2e; --sidebar-bg: #f8f9fa; --border: #e0e0e0;
+    --primary: #2563eb; --method-get: #059669; --method-post: #2563eb;
+    --method-put: #d97706; --method-patch: #d97706; --method-delete: #dc2626;
+    --badge-bg: #e8f0fe; --badge-auth: #fef3c7; --badge-public: #d1fae5;
+    --badge-fp: #fce7f3; --badge-captcha: #fee2e2; --badge-cond: #e0e7ff;
+    --code-bg: #f4f4f5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--fg); line-height: 1.6; }
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+.sidebar h1 { font-size: 1.2rem; margin-bottom: 4px; }
+.sidebar .version { font-size: 0.8rem; color: #666; margin-bottom: 16px; }
+.sidebar input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; }
+.sidebar a { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; text-decoration: none; color: var(--fg); border-radius: 4px; font-size: 0.9rem; margin-bottom: 2px; }
+.sidebar a:hover { background: #e8e8e8; }
+.sidebar a .badge { background: var(--badge-bg); color: var(--primary); font-size: 0.75rem; padding: 1px 6px; border-radius: 10px; }
+.sidebar .nav-intro { color: #666; font-style: italic; }
+.main { flex: 1; padding: 40px; max-width: 960px; }
+h2 { font-size: 1.5rem; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+.endpoint { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.endpoint-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; background: var(--sidebar-bg); }
+.endpoint-header:hover { background: #eee; }
+.endpoint.collapsed .endpoint-body { display: none; }
+.endpoint.collapsed .chevron { transform: rotate(-90deg); }
+.chevron { margin-left: auto; font-size: 0.7rem; color: #999; transition: transform 0.2s; }
+.endpoint-body { padding: 16px; border-top: 1px solid var(--border); }
+.method { font-weight: 700; font-size: 0.8rem; padding: 3px 8px; border-radius: 4px; color: #fff; min-width: 60px; text-align: center; text-transform: uppercase; }
+.method-get { background: var(--method-get); }
+.method-post { background: var(--method-post); }
+.method-put, .method-patch { background: var(--method-put); }
+.method-delete { background: var(--method-delete); }
+.path { font-family: 'SF Mono', Monaco, monospace; font-size: 0.95rem; }
+.description { color: #555; margin-bottom: 12px; }
+.security-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.badge-auth { background: var(--badge-auth); color: #92400e; }
+.badge-public { background: var(--badge-public); color: #065f46; }
+.badge-fingerprint { background: var(--badge-fp); color: #9d174d; }
+.badge-conditional { background: var(--badge-cond); color: #3730a3; }
+.badge-captcha { background: var(--badge-captcha); color: #991b1b; }
+.security-badges .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+h4 { font-size: 0.95rem; margin: 12px 0 8px; }
+.params-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 12px; }
+.params-table th, .params-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.params-table th { background: var(--sidebar-bg); font-weight: 600; }
+pre { background: var(--code-bg); padding: 12px 16px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; margin-bottom: 12px; }
+code { font-family: 'SF Mono', Monaco, 'Courier New', monospace; }
+.intro-content { line-height: 1.7; }
+.intro-content p { margin-bottom: 12px; }
+.intro-content code { background: var(--code-bg); padding: 2px 6px; border-radius: 3px; }
+.intro-content pre { margin: 12px 0; }
+.intro-content h3 { margin: 20px 0 8px; }
+.intro-content ul, .intro-content ol { margin: 8px 0 12px 24px; }
+@media print {
+    .sidebar { display: none; }
+    .main { max-width: 100%; padding: 20px; }
+    .endpoint.collapsed .endpoint-body { display: block; }
+}
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar">
+    <img src="https://everyx.io/favicon-dark.png" alt="EveryX" style="width:40px;height:40px;margin-bottom:8px;">
+    <h1>EveryX API</h1>
+    <div class="version">v3.4.1 &middot; 2026-02-11</div>
+    <input type="text" id="search" placeholder="Search endpoints..." oninput="filterEndpoints(this.value)">
+    <a href="#authentication" class="nav-intro">Authentication</a>
+    <a href="#security-verification" class="nav-intro">Security Verification</a>
+    <a href="#error-handling" class="nav-intro">Error Handling</a>
+    <a href="#authentication" class="nav-group">Authentication <span class="badge">12</span></a>
+    <a href="#user-profile" class="nav-group">User Profile <span class="badge">17</span></a>
+    <a href="#two-factor-auth" class="nav-group">Two-Factor Auth <span class="badge">6</span></a>
+    <a href="#wallets" class="nav-group">Wallets <span class="badge">4</span></a>
+    <a href="#trading" class="nav-group">Trading <span class="badge">3</span></a>
+    <a href="#events" class="nav-group">Events <span class="badge">21</span></a>
+    <a href="#dashboard" class="nav-group">Dashboard <span class="badge">5</span></a>
+    <a href="#deposits" class="nav-group">Deposits <span class="badge">2</span></a>
+    <a href="#withdrawals" class="nav-group">Withdrawals <span class="badge">2</span></a>
+</nav>
+<main class="main">
+    <section id="authentication"><h2>Authentication</h2><div class="intro-content"><h3>Authentication Guide</h3>
+<h3>JWT Bearer Token</h3>
+<p>Most endpoints require authentication via JWT Bearer Token in the <code>Authorization</code> header:</p>
+<pre><code class="language-">Authorization: Bearer <token>
+</code></pre>
+<strong>Obtaining a token:</strong>
+<p>1. <strong>Email + OTP flow</strong>: <code>POST /auth/v2/otp/token</code> with email to receive OTP via email, then <code>POST /tokens</code> with OTP code to get JWT</p>
+<p>2. <strong>Wallet flow</strong>: <code>GET /auth/v2/wallet/nonce</code> to get a nonce, sign it with your wallet, then <code>POST /auth/v2/wallet/verify</code> with the signature</p>
+<p>3. <strong>Google OAuth</strong>: <code>POST /auth/v2/google/verify</code> with Google ID token</p>
+<strong>Token lifecycle:</strong>
+<ul><li>Tokens are valid until explicitly destroyed or expired</li>
+<li>Use <code>POST /tokens/validate</code> to check token validity</li>
+<li>Use <code>DELETE /tokens</code> to invalidate a token</li>
+</ul>
+<h3>Developer Authentication (HMAC-SHA256)</h3>
+<p>For server-to-server integrations, developer authentication is available as an alternative to JWT. This uses HMAC-SHA256 signatures and bypasses fingerprint/captcha requirements.</p>
+<strong>Headers required:</strong>
+<ul><li><code>X-Developer-Id</code>: Your developer account ID</li>
+<li><code>X-Developer-Timestamp</code>: Unix timestamp (seconds) - must be within 5 minutes of server time</li>
+<li><code>X-Developer-Signature</code>: HMAC-SHA256 signature of the request</li>
+</ul>
+<strong>Signature computation:</strong>
+<pre><code class="language-">message = HTTP_METHOD + path + timestamp + canonical_body
+<p>signature = HMAC-SHA256(message, developer_secret)</p>
+</code></pre>
+<p>Where <code>canonical_body</code> is the JSON body with sorted keys (empty string if no body).</p>
+<p>Contact the EveryX team for developer credentials.</p></div></section>
+<section id="security-verification"><h2>Security Verification</h2><div class="intro-content"><h3>Security Verification</h3>
+<p>Certain API endpoints may require additional security verification beyond authentication. The system uses a layered approach:</p>
+<h3>HTTP 428 - Security Verification Required</h3>
+<p>When an endpoint requires security verification and the required headers are missing, you will receive:</p>
+<pre><code class="language-json">{
+    "statusCode": 428,
+    "error": "Precondition Required",
+    "message": "Security verification required"
+}
+</code></pre>
+<h3>Fingerprint Verification</h3>
+<p>Some endpoints require device fingerprint verification. When required, include these headers:</p>
+<ul><li><code>X-Fingerprint-Sealed-Result</code>: Sealed fingerprint result from Fingerprint.com</li>
+<li><code>X-Fingerprint-Request-Id</code>: Request ID from Fingerprint.com</li>
+</ul>
+<strong>Fingerprint levels:</strong>
+<ul><li><strong>Required</strong>: Always required (e.g., registration). Returns HTTP 428 without headers.</li>
+<li><strong>Conditional</strong>: Based on server-side rules (user level, country, risk score). The API may return <code>X-Security-Required</code> response header to indicate frontend should collect fingerprint for future requests.</li>
+<li><strong>None</strong>: Public endpoints with no security verification.</li>
+</ul>
+<h3>CAPTCHA Verification</h3>
+<p>Some high-risk endpoints require CAPTCHA verification:</p>
+<ul><li><code>X-Captcha-Token</code>: CAPTCHA solution token</li>
+</ul>
+<h3>Developer Auth Bypass</h3>
+<p>Requests authenticated via Developer Auth (HMAC-SHA256) bypass all fingerprint and captcha requirements. This is the recommended approach for server-to-server integrations.</p></div></section>
+<section id="error-handling"><h2>Error Handling</h2><div class="intro-content"><h3>Error Handling</h3>
+<h3>Response Format</h3>
+<strong>Success responses:</strong>
+<pre><code class="language-json">{
+    "success": true,
+    "data": { ... },
+    "meta": {
+        "version": "3.5.1",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+}
+</code></pre>
+<strong>Error responses:</strong>
+<pre><code class="language-json">{
+    "statusCode": 400,
+    "error": "Bad Request",
+    "message": "Description of what went wrong"
+}
+</code></pre>
+<h3>Common HTTP Status Codes</h3>
+| Code | Meaning |
+|---|---|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request - invalid input or validation failure |
+| 401 | Unauthorized - missing or invalid authentication |
+| 403 | Forbidden - insufficient permissions or trust level |
+| 404 | Not Found |
+| 409 | Conflict - resource already exists |
+| 422 | Unprocessable Entity - valid syntax but semantic error |
+| 428 | Precondition Required - security verification needed |
+| 429 | Too Many Requests - rate limit exceeded |
+| 500 | Internal Server Error |
+| 503 | Service Unavailable - maintenance mode |
+<h3>Rate Limiting</h3>
+<p>API endpoints are rate-limited. When exceeded, you receive HTTP 429 with a <code>Retry-After</code> header indicating seconds to wait.</p>
+<h3>Pagination</h3>
+<p>List endpoints support pagination via query parameters:</p>
+<ul><li><code>page</code> - Page number (default: 1)</li>
+<li><code>limit</code> - Items per page (default varies, max 100)</li>
+</ul>
+<p>Paginated responses include:</p>
+<pre><code class="language-json">{
+    "pagination": {
+        "page": 1,
+        "limit": 20,
+        "total": 150,
+        "pages": 8
+    }
+}
+</code></pre></div></section>
+    <section id="authentication"><h2>Authentication</h2>
+                <div class="endpoint" id="get--tokens-validate">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/tokens/validate</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Checks if the provided token is still valid</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;valid&quot;: true
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--auth-v2-login--email-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/auth/v2/login/{email}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Login v2, Send Login Mail</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--auth-v2-user-exists--email-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/auth/v2/user/exists/{email}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Check if User Exists</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">true</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="delete--tokens">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-delete">DELETE</span>
+                        <span class="path">/tokens</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">User logs out from the system</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--tokens">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/tokens</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Request User Token for Accessing User API. This endpoint is blocked during system maintenance.</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>password</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;_id&quot;: &quot;string&quot;,
+  &quot;created_at&quot;: &quot;string&quot;,
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--passwords">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/passwords</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">User Forget Password</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>token</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>password</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">&quot;string&quot;</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="put--passwords">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-put">PUT</span>
+                        <span class="path">/passwords</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Change User Password</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>old_password</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td>Current password of the user to verify identity.</td></tr>
+<tr><td><code>password</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--register">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/register</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Register User with process-based rate limiting, email validation, and CAPTCHA support. Use /v1/register for legacy endpoint. This endpoint is blocked during system maintenance.</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span> <span class="badge badge-fingerprint">Fingerprint Required</span> <span class="badge badge-captcha">CAPTCHA Required</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>display_name</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>first_name</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>middle_name</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>last_name</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>country</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>state</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>city</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>street</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>building</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>zip</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>phone</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>referral_code</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>myaffiliate_id</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>tracking_id</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>source</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;action&quot;: &quot;login&quot;,
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;email&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--auth-v2-google-verify">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/auth/v2/google/verify</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verify the Google ID token received from the frontend. This endpoint is blocked during system maintenance.</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>idToken</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>email</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>referral_code</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>myaffiliate_id</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>tracking_id</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>source</code></td><td>body</td><td>source</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;idToken&quot;: &quot;string&quot;,
+  &quot;email&quot;: &quot;string&quot;,
+  &quot;referral_code&quot;: &quot;string&quot;,
+  &quot;myaffiliate_id&quot;: &quot;string&quot;,
+  &quot;tracking_id&quot;: &quot;string&quot;,
+  &quot;source&quot;: &quot;organic&quot;
+}</code></pre>
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;email&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;
+  },
+  &quot;user_action&quot;: &quot;login&quot;,
+  &quot;is_new_user&quot;: true,
+  &quot;created_at&quot;: &quot;string&quot;,
+  &quot;token&quot;: {},
+  &quot;tracking_data&quot;: {
+    &quot;ip&quot;: &quot;string&quot;,
+    &quot;wallet_address&quot;: &quot;string&quot;
+  },
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--auth-v2-otp-token">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/auth/v2/otp/token</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Generate authentication token for users who have been verified via OTP (no password required)</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Email address of the user</td></tr>
+<tr><td><code>otp_code</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>6-digit OTP code sent to the user email</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;email&quot;: &quot;string&quot;,
+  &quot;otp_code&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;token&quot;: &quot;string&quot;,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;email&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--auth-v2-wallet-nonce">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/auth/v2/wallet/nonce</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Generate a nonce for MetaMask authentication</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>walletAddress</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;walletAddress&quot;: &quot;string&quot;
+}</code></pre>
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--auth-v2-wallet-verify">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/auth/v2/wallet/verify</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verify MetaMask signature and issue JWT token. This endpoint is blocked during system maintenance.</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>signature</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Ethereum signature in 0x-prefixed 65-byte hex format (r,s,v)</td></tr>
+<tr><td><code>walletAddress</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>referral_code</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>myaffiliate_id</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>tracking_id</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>source</code></td><td>body</td><td>source</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;signature&quot;: &quot;string&quot;,
+  &quot;walletAddress&quot;: &quot;string&quot;,
+  &quot;referral_code&quot;: &quot;string&quot;,
+  &quot;myaffiliate_id&quot;: &quot;string&quot;,
+  &quot;tracking_id&quot;: &quot;string&quot;,
+  &quot;source&quot;: &quot;organic&quot;
+}</code></pre>
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;email&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;
+  },
+  &quot;user_action&quot;: &quot;login&quot;,
+  &quot;is_new_user&quot;: true,
+  &quot;created_at&quot;: &quot;string&quot;,
+  &quot;token&quot;: {},
+  &quot;tracking_data&quot;: {
+    &quot;ip&quot;: &quot;string&quot;,
+    &quot;wallet_address&quot;: &quot;string&quot;
+  },
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div></section>
+<section id="user-profile"><h2>User Profile</h2>
+                <div class="endpoint" id="get--me">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/me</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Request Current User Data</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;email&quot;: &quot;string&quot;,
+  &quot;wallet_address&quot;: &quot;string&quot;,
+  &quot;full_name&quot;: &quot;string&quot;,
+  &quot;first_name&quot;: &quot;string&quot;,
+  &quot;middle_name&quot;: &quot;string&quot;,
+  &quot;last_name&quot;: &quot;string&quot;,
+  &quot;display_name&quot;: &quot;string&quot;,
+  &quot;about&quot;: &quot;string&quot;,
+  &quot;country&quot;: &quot;string&quot;,
+  &quot;state&quot;: &quot;string&quot;,
+  &quot;city&quot;: &quot;string&quot;,
+  &quot;street&quot;: &quot;string&quot;,
+  &quot;building&quot;: &quot;string&quot;,
+  &quot;zip&quot;: &quot;string&quot;,
+  &quot;phone&quot;: &quot;string&quot;,
+  &quot;currency&quot;: &quot;string&quot;,
+  &quot;current_level&quot;: 0,
+  &quot;trader_id&quot;: &quot;string&quot;,
+  &quot;avatar&quot;: &quot;string&quot;,
+  &quot;email_verified&quot;: true,
+  &quot;identity_verified&quot;: true,
+  &quot;redo_kyc&quot;: true,
+  &quot;referral_code&quot;: &quot;string&quot;,
+  &quot;referral_code_expires_at&quot;: &quot;string&quot;,
+  &quot;referral_code_quota&quot;: 0,
+  &quot;phone_verified&quot;: true,
+  &quot;is_new&quot;: true,
+  &quot;isUpgraded&quot;: true,
+  &quot;is_upgraded&quot;: true,
+  &quot;leaderBoardCampaignShown&quot;: true,
+  &quot;leaderboard_campaign_shown&quot;: true,
+  &quot;terms_accepted&quot;: true,
+  &quot;terms_accepted_at&quot;: &quot;string&quot;,
+  &quot;user_level&quot;: {
+    &quot;current_level&quot;: 0,
+    &quot;level_name&quot;: &quot;string&quot;,
+    &quot;coratio&quot;: 0,
+    &quot;perks&quot;: {
+      &quot;can_browse_events&quot;: true,
+      &quot;can_deposit_crypto&quot;: true,
+      &quot;can_trade_regular&quot;: true,
+      &quot;can_refer_friends&quot;: true,
+      &quot;can_receive_bonuses&quot;: true,
+      &quot;can_use_bonuses&quot;: true,
+      &quot;can_withdraw&quot;: true,
+      &quot;can_deposit_credit_card&quot;: true,
+      &quot;can_trade_vip_events&quot;: true
+    },
+    &quot;all_levels_progress&quot;: {
+      &quot;string&quot;: {
+        &quot;level&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;coratio&quot;: &quot;...&quot;,
+        &quot;is_completed&quot;: &quot;...&quot;,
+        &quot;is_current&quot;: &quot;...&quot;,
+        &quot;requirements&quot;: &quot;...&quot;,
+        &quot;progress&quot;: &quot;...&quot;
+      }
+    },
+    &quot;bypass_enabled&quot;: true
+  },
+  &quot;withdrawal_limits&quot;: {
+    &quot;period&quot;: &quot;daily&quot;,
+    &quot;limit&quot;: 0,
+    &quot;used&quot;: 0,
+    &quot;remaining&quot;: 0,
+    &quot;reset_date&quot;: &quot;string&quot;
+  },
+  &quot;can_add_invite_code&quot;: true,
+  &quot;invite_code_deadline&quot;: &quot;string&quot;,
+  &quot;terms_compliance&quot;: {
+    &quot;compliant&quot;: true,
+    &quot;requiredVersion&quot;: &quot;string&quot;,
+    &quot;acceptedVersion&quot;: &quot;string&quot;,
+    &quot;acceptedAt&quot;: &quot;string&quot;,
+    &quot;reason&quot;: &quot;string&quot;,
+    &quot;url&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--profile-level-upgrade-requirements">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/profile/level-upgrade-requirements</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Returns T&amp;C and other requirements needed before user can upgrade to next level. Used to check if user must accept new terms before level promotion.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>target_level</code></td><td>query</td><td>integer</td><td>no</td><td>Target level to check requirements for. Defaults to current level + 1.</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;current_level&quot;: 0,
+  &quot;target_level&quot;: 0,
+  &quot;requirements&quot;: {
+    &quot;terms&quot;: {
+      &quot;required&quot;: true,
+      &quot;compliant&quot;: true,
+      &quot;required_version&quot;: &quot;string&quot;,
+      &quot;accepted_version&quot;: &quot;string&quot;,
+      &quot;url&quot;: &quot;string&quot;,
+      &quot;reason&quot;: &quot;string&quot;
+    }
+  },
+  &quot;can_upgrade&quot;: true
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--email-verification">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/email-verification</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Send a verification OTP code to the user. Optionally update email if provided.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>email</code></td><td>formData</td><td>string</td><td>no</td><td>New email address (optional)</td></tr>
+<tr><td><code>type</code></td><td>formData</td><td>string</td><td>no</td><td>Verification type</td></tr>
+<tr><td><code>ref</code></td><td>formData</td><td>string</td><td>no</td><td>Referral code</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--email-verification-resend">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/email-verification/resend</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Resend email verification for the authenticated user</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>ref</code></td><td>formData</td><td>string</td><td>no</td><td>Referral code</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--email-verification-verify">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/email-verification/verify</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verify 6-digit OTP code for login flow</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Email address to verify</td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>6-digit OTP code</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;email&quot;: &quot;string&quot;,
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;tracking_data&quot;: {
+    &quot;ip&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--email-verification-verify-signup">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/email-verification/verify-signup</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verify OTP code for signup flow (user may not exist yet)</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>email</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Email address to verify</td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>6-digit OTP code</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;email&quot;: &quot;string&quot;,
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;tracking_data&quot;: {
+    &quot;ip&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--phone-complete">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/phone/complete</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verifies OTP and moves phone_pending to phone. Phone number is taken from user profile.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>OTP token entered by user</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;ok&quot;: true,
+  &quot;verificationData&quot;: {}
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--phone-resend-otp">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/phone/resend-otp</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Uses UserOtpService with 10-minute deduplication window (matches OTP expiry) to prevent duplicate SMS sends. Protected by rate limiting (3 requests per 5 minutes) and deduplication. SECURITY: Phone number is NOT accepted from request payload - uses user's stored phone only.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>x-captcha-token</code></td><td>header</td><td>string</td><td>no</td><td>CAPTCHA response token (Google reCAPTCHA or Cloudflare Turnstile) - required only when CAPTCHA is enabled</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;ok&quot;: true,
+  &quot;channel&quot;: &quot;string&quot;,
+  &quot;ttl&quot;: 0
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-accept-terms">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/accept-terms</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Accept a specific version of terms and conditions. Records the version and timestamp of acceptance.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>terms_version</code></td><td>body</td><td>string</td><td>no</td><td>Version of terms being accepted. If omitted, uses the latest version for user level.</td></tr>
+<tr><td><code>level</code></td><td>body</td><td>integer</td><td>no</td><td>User level for T&amp;C acceptance (-1=registration, 0-3=user levels). Defaults to current user level.</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;terms_version&quot;: &quot;string&quot;,
+  &quot;level&quot;: 0
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;version&quot;: &quot;string&quot;,
+  &quot;level&quot;: 0,
+  &quot;accepted_at&quot;: &quot;string&quot;,
+  &quot;already_accepted&quot;: true
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-check-phone">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/check-phone</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Returns whether a phone number is available for use</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>phone</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Phone number to check</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;phone&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;ok&quot;: true,
+  &quot;available&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-invite-code">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/invite-code</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Allows users who registered without an invite code to add one within a configurable time window.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>code</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Invite code to apply</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;code&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;code&quot;: &quot;string&quot;,
+  &quot;bonus_amount&quot;: 0
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-verify-email">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/verify-email</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verify 6-digit OTP code sent to email and mark email as verified</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>email</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td>Email address to verify</td></tr>
+<tr><td><code>otp</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td>6-digit OTP code</td></tr>
+<tr><td><code>type</code></td><td>formData</td><td>string</td><td>no</td><td>Verification type</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-verify-phone">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/verify-phone</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Update phone verification status for the authenticated user</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>x-totp-token</code></td><td>header</td><td>string</td><td>no</td><td>Optional TOTP code for inline 2FA verification</td></tr>
+<tr><td><code>phone</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Phone number to verify</td></tr>
+<tr><td><code>verified</code></td><td>body</td><td>boolean</td><td><strong>yes</strong></td><td>Verification status</td></tr>
+<tr><td><code>verificationData</code></td><td>body</td><td>PhoneVerificationData</td><td>no</td><td></td></tr>
+<tr><td><code>verificationMethod</code></td><td>body</td><td>verificationMethod</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;phone&quot;: &quot;string&quot;,
+  &quot;verified&quot;: true,
+  &quot;verificationData&quot;: {
+    &quot;number&quot;: &quot;string&quot;,
+    &quot;dialCode&quot;: &quot;string&quot;
+  },
+  &quot;verificationMethod&quot;: &quot;sms_otp&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;ok&quot;: true,
+  &quot;phone_verified&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="put--phone">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-put">PUT</span>
+                        <span class="path">/phone</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">User Change Their Phone Number. Automatically sends OTP to the new number. The user phone number will be updated after OTP verification.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>phone</code></td><td>formData</td><td>string</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="put--profile">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-put">PUT</span>
+                        <span class="path">/profile</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Update User Profile</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>x-totp-token</code></td><td>header</td><td>string</td><td>no</td><td>Optional TOTP code for inline 2FA verification</td></tr>
+<tr><td><code>first_name</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>middle_name</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>last_name</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>display_name</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>about</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>country</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>state</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>city</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>street</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>building</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>zip</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>phone</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>avatar</code></td><td>body</td><td>string</td><td>no</td><td>aka. User Photo</td></tr>
+<tr><td><code>email</code></td><td>body</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>is_new</code></td><td>body</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>leaderBoardCampaignShown</code></td><td>body</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>isUpgraded</code></td><td>body</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;first_name&quot;: &quot;string&quot;,
+  &quot;middle_name&quot;: &quot;string&quot;,
+  &quot;last_name&quot;: &quot;string&quot;,
+  &quot;display_name&quot;: &quot;string&quot;,
+  &quot;about&quot;: &quot;string&quot;,
+  &quot;country&quot;: &quot;string&quot;,
+  &quot;state&quot;: &quot;string&quot;,
+  &quot;city&quot;: &quot;string&quot;,
+  &quot;street&quot;: &quot;string&quot;,
+  &quot;building&quot;: &quot;string&quot;,
+  &quot;zip&quot;: &quot;string&quot;,
+  &quot;phone&quot;: &quot;string&quot;,
+  &quot;avatar&quot;: &quot;string&quot;,
+  &quot;email&quot;: &quot;string&quot;,
+  &quot;is_new&quot;: true,
+  &quot;leaderBoardCampaignShown&quot;: true,
+  &quot;isUpgraded&quot;: true
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;user&quot;: {}
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="put--profile-wallet">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-put">PUT</span>
+                        <span class="path">/profile/wallet</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Allows the user to update their wallet address after verifying phone OTP.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>walletAddress</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td>New Ethereum wallet address (0x...)</td></tr>
+<tr><td><code>token</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td>Phone verification OTP token</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;wallet_address&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="put--user-profile-reset-upgrade-flag">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-put">PUT</span>
+                        <span class="path">/user/profile/reset-upgrade-flag</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Resets the isUpgraded flag to false after frontend has shown the upgrade notification</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div></section>
+<section id="two-factor-auth"><h2>Two-Factor Auth</h2>
+                <div class="endpoint" id="get--profile-2fa-status">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/profile/2fa/status</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get 2FA status for user</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-2fa-backup-codes">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/2fa/backup-codes</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Regenerate backup codes (requires TOTP verification)</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>TOTP code from authenticator app for verification</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-2fa-disable">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/2fa/disable</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Disable 2FA (requires TOTP verification)</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>TOTP code from authenticator app or backup code for verification</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-2fa-setup">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/2fa/setup</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Setup 2FA for user - generates secret and QR code</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-2fa-verify">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/2fa/verify</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verify TOTP code and enable 2FA</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>6-digit TOTP code from authenticator app</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--profile-2fa-verify-token">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/profile/2fa/verify-token</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Verifies TOTP code and creates a 15-minute session. After successful verification, subsequent requests to 2FA-protected routes will pass through.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>TOTP code from authenticator app or backup code</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        
+                    </div>
+                </div></section>
+<section id="wallets"><h2>Wallets</h2>
+                <div class="endpoint" id="get--wallets">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/wallets</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List wallets of current login user with optimized MySQL queries</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>include_balances</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;wallets&quot;: {
+    &quot;topup&quot;: {
+      &quot;id&quot;: 0,
+      &quot;balance&quot;: 0,
+      &quot;currency&quot;: &quot;string&quot;,
+      &quot;withdrawable&quot;: true,
+      &quot;can_wager&quot;: true,
+      &quot;last_transaction_at&quot;: &quot;string&quot;
+    },
+    &quot;profit&quot;: {
+      &quot;id&quot;: 0,
+      &quot;balance&quot;: 0,
+      &quot;currency&quot;: &quot;string&quot;,
+      &quot;withdrawable&quot;: true,
+      &quot;can_wager&quot;: true,
+      &quot;last_transaction_at&quot;: &quot;string&quot;
+    },
+    &quot;bonus&quot;: {
+      &quot;id&quot;: 0,
+      &quot;balance&quot;: 0,
+      &quot;currency&quot;: &quot;string&quot;,
+      &quot;withdrawable&quot;: true,
+      &quot;can_wager&quot;: true,
+      &quot;last_transaction_at&quot;: &quot;string&quot;
+    }
+  },
+  &quot;balances&quot;: {
+    &quot;topup&quot;: 0,
+    &quot;profit&quot;: 0,
+    &quot;bonus&quot;: 0,
+    &quot;total&quot;: 0,
+    &quot;withdrawable&quot;: 0
+  },
+  &quot;trader_id&quot;: &quot;string&quot;,
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--wallets-withdrawable-balance">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/wallets/withdrawable-balance</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get the user's withdrawable balance from V2 wallet system using formula: MAX(0, TOPUP + PROFIT - CORATIO * X) where X = BONUS_BALANCE + BONUS_USED_IN_ACTIVE_WAGERS.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;withdrawable_balance&quot;: 0,
+  &quot;balances&quot;: {
+    &quot;topup&quot;: 0,
+    &quot;profit&quot;: 0,
+    &quot;bonus&quot;: 0,
+    &quot;total&quot;: 0,
+    &quot;withdrawable&quot;: 0
+  },
+  &quot;breakdown&quot;: {
+    &quot;topup_withdrawable&quot;: 0,
+    &quot;profit_withdrawable&quot;: 0,
+    &quot;bonus_withdrawable&quot;: 0,
+    &quot;coratio_factor&quot;: 0,
+    &quot;coratio_value&quot;: 0,
+    &quot;bonus_balance&quot;: 0,
+    &quot;bonus_used_in_active_wagers&quot;: 0,
+    &quot;x_value&quot;: 0
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--wallets--wallet-type--details">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/wallets/{wallet_type}/details</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get detailed information about a specific wallet type in the V2 system</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>wallet_type</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;wallet&quot;: {
+    &quot;id&quot;: 0,
+    &quot;wallet_type&quot;: &quot;string&quot;,
+    &quot;balance&quot;: 0,
+    &quot;name&quot;: &quot;string&quot;,
+    &quot;currency&quot;: &quot;string&quot;,
+    &quot;withdrawable&quot;: true,
+    &quot;can_wager&quot;: true,
+    &quot;last_transaction_at&quot;: &quot;string&quot;,
+    &quot;is_active&quot;: true
+  },
+  &quot;trader_id&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--wallets--wallet-type--transactions">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/wallets/{wallet_type}/transactions</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List transactions for a specific wallet type in the V2 system</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>wallet_type</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>from</code></td><td>query</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>to</code></td><td>query</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>transaction_type</code></td><td>query</td><td>number</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;transactions&quot;: [
+    {
+      &quot;id&quot;: 0,
+      &quot;amount&quot;: 0,
+      &quot;transaction_type&quot;: 0,
+      &quot;from&quot;: 0,
+      &quot;to&quot;: 0,
+      &quot;metadata&quot;: {},
+      &quot;event_name&quot;: &quot;string&quot;,
+      &quot;event_id&quot;: &quot;string&quot;,
+      &quot;created_at&quot;: &quot;string&quot;,
+      &quot;status&quot;: &quot;COMPLETED&quot;,
+      &quot;is_grouped&quot;: true
+    }
+  ]
+}</code></pre>
+                    </div>
+                </div></section>
+<section id="trading"><h2>Trading</h2>
+                <div class="endpoint" id="get--wagers-preflight">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/wagers/preflight</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Returns user balances, bonus limits, and max usable bonus for an event/outcome before placing a wager</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>event_id</code></td><td>query</td><td>string</td><td><strong>yes</strong></td><td>Event code</td></tr>
+<tr><td><code>outcome_id</code></td><td>query</td><td>string</td><td>no</td><td>Outcome code (optional - if omitted, returns data for all outcomes)</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;outcome_id&quot;: &quot;string&quot;,
+    &quot;user_level&quot;: 0,
+    &quot;balances&quot;: {
+      &quot;topup&quot;: 0,
+      &quot;profit&quot;: 0,
+      &quot;bonus&quot;: 0,
+      &quot;available_without_bonus&quot;: 0,
+      &quot;available_with_bonus&quot;: 0
+    },
+    &quot;bonus_info&quot;: {
+      &quot;max_bonus_usable&quot;: 0,
+      &quot;bonus_limit_per_event&quot;: 0,
+      &quot;bonus_used_on_event&quot;: 0,
+      &quot;bonus_remaining_for_event&quot;: 0,
+      &quot;reason&quot;: &quot;level_locked&quot;,
+      &quot;reason_message&quot;: &quot;string&quot;
+    },
+    &quot;outcome_info&quot;: {
+      &quot;max_trade_size&quot;: 0
+    }
+  },
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--wagers-events--event-id-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/wagers/events/{event_id}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get all wager positions for the authenticated user for a specific event</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Event ID (code) to filter wager positions</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;type&quot;: &quot;string&quot;,
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;trader_id&quot;: &quot;string&quot;,
+    &quot;user_id&quot;: &quot;string&quot;,
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_status&quot;: &quot;string&quot;,
+    &quot;event_images_url&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;event&quot;: {
+      &quot;_id&quot;: &quot;string&quot;,
+      &quot;code&quot;: &quot;string&quot;,
+      &quot;ticker&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;string&quot;,
+      &quot;ends_at&quot;: &quot;string&quot;,
+      &quot;closed_at&quot;: &quot;string&quot;,
+      &quot;status&quot;: &quot;string&quot;,
+      &quot;resolved_outcome_id&quot;: &quot;string&quot;,
+      &quot;outcomes&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;event_images_url&quot;: [
+        &quot;...&quot;
+      ]
+    },
+    &quot;wagered_at&quot;: &quot;string&quot;,
+    &quot;pledge&quot;: 0,
+    &quot;is_leveraged&quot;: true,
+    &quot;wager&quot;: 0,
+    &quot;indicative_return&quot;: 0,
+    &quot;indicative_payout&quot;: 0,
+    &quot;unrealized_pnl&quot;: 0,
+    &quot;indicative_pnl&quot;: 0,
+    &quot;payout_return_for_new_wagers&quot;: 0,
+    &quot;probability&quot;: 0,
+    &quot;stop_probability&quot;: 0,
+    &quot;realized_return&quot;: 0,
+    &quot;realized_payout&quot;: 0,
+    &quot;realized_payoff&quot;: 0,
+    &quot;realized_pnl&quot;: 0,
+    &quot;final_indicative_return&quot;: 0,
+    &quot;fill_count&quot;: 0,
+    &quot;entry_probability&quot;: 0,
+    &quot;current_probability&quot;: 0,
+    &quot;probability_change&quot;: 0,
+    &quot;created_at&quot;: &quot;string&quot;,
+    &quot;last_update_time&quot;: &quot;string&quot;,
+    &quot;last_reason&quot;: &quot;string&quot;,
+    &quot;positions&quot;: [
+      {
+        &quot;type&quot;: &quot;...&quot;,
+        &quot;id&quot;: &quot;...&quot;,
+        &quot;trader_id&quot;: &quot;...&quot;,
+        &quot;user_id&quot;: &quot;...&quot;,
+        &quot;event_id&quot;: &quot;...&quot;,
+        &quot;event_status&quot;: &quot;...&quot;,
+        &quot;event_outcome_id&quot;: &quot;...&quot;,
+        &quot;event&quot;: &quot;...&quot;,
+        &quot;event_outcome&quot;: &quot;...&quot;,
+        &quot;wagered_at&quot;: &quot;...&quot;,
+        &quot;pledge&quot;: &quot;...&quot;,
+        &quot;is_leveraged&quot;: &quot;...&quot;,
+        &quot;leverage&quot;: &quot;...&quot;,
+        &quot;wager&quot;: &quot;...&quot;,
+        &quot;indicative_return&quot;: &quot;...&quot;,
+        &quot;indicative_payout&quot;: &quot;...&quot;,
+        &quot;unrealized_pnl&quot;: &quot;...&quot;,
+        &quot;indicative_pnl&quot;: &quot;...&quot;,
+        &quot;payout_return_for_new_wagers&quot;: &quot;...&quot;,
+        &quot;probability&quot;: &quot;...&quot;,
+        &quot;stop_probability&quot;: &quot;...&quot;,
+        &quot;realized_return&quot;: &quot;...&quot;,
+        &quot;realized_payout&quot;: &quot;...&quot;,
+        &quot;realized_payoff&quot;: &quot;...&quot;,
+        &quot;realized_pnl&quot;: &quot;...&quot;,
+        &quot;final_indicative_return&quot;: &quot;...&quot;,
+        &quot;fill_count&quot;: &quot;...&quot;,
+        &quot;entry_probability&quot;: &quot;...&quot;,
+        &quot;current_probability&quot;: &quot;...&quot;,
+        &quot;probability_change&quot;: &quot;...&quot;,
+        &quot;created_at&quot;: &quot;...&quot;,
+        &quot;last_update_time&quot;: &quot;...&quot;,
+        &quot;last_reason&quot;: &quot;...&quot;,
+        &quot;status&quot;: &quot;...&quot;,
+        &quot;stop_warning&quot;: &quot;...&quot;,
+        &quot;stop_distance&quot;: &quot;...&quot;,
+        &quot;wager_position_id&quot;: &quot;...&quot;,
+        &quot;wager_id&quot;: &quot;...&quot;
+      }
+    ]
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--wagers">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/wagers</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Make a wager (bet)</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>wallet_id</code></td><td>formData</td><td>integer</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_id</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_outcome_id</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>pledge</code></td><td>formData</td><td>number</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>leverage</code></td><td>formData</td><td>number</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>wager</code></td><td>formData</td><td>number</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>loan</code></td><td>formData</td><td>number</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>max_payout</code></td><td>formData</td><td>number</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>force_leverage</code></td><td>formData</td><td>boolean</td><td>no</td><td>If set to True, then no matter what value is given for leverage the new wager will be added to the leveraged position.</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;id&quot;: 0,
+  &quot;event_id&quot;: &quot;string&quot;,
+  &quot;event_outcome_id&quot;: &quot;string&quot;,
+  &quot;pledge&quot;: 0,
+  &quot;leverage&quot;: 0,
+  &quot;wager&quot;: 0,
+  &quot;created_at&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div></section>
+<section id="events"><h2>Events</h2>
+                <div class="endpoint" id="get--event-groups">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/event-groups</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get list of visible EventGroups (Mention Markets)</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>group_type</code></td><td>query</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>is_featured</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;_id&quot;: &quot;string&quot;,
+      &quot;code&quot;: &quot;string&quot;,
+      &quot;slug&quot;: &quot;string&quot;,
+      &quot;group_type&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;string&quot;,
+      &quot;rules&quot;: &quot;string&quot;,
+      &quot;image_url&quot;: &quot;string&quot;,
+      &quot;banner_image_url&quot;: &quot;string&quot;,
+      &quot;og_image_url&quot;: &quot;string&quot;,
+      &quot;stream_url&quot;: &quot;string&quot;,
+      &quot;status&quot;: &quot;string&quot;,
+      &quot;is_featured&quot;: true,
+      &quot;starts_at&quot;: &quot;string&quot;,
+      &quot;ends_at&quot;: &quot;string&quot;,
+      &quot;match_date&quot;: &quot;string&quot;,
+      &quot;timezone&quot;: &quot;string&quot;,
+      &quot;trading_gate_open&quot;: true,
+      &quot;events&quot;: [
+        &quot;...&quot;
+      ]
+    }
+  ],
+  &quot;pagination&quot;: {
+    &quot;currentPage&quot;: 0,
+    &quot;totalPages&quot;: 0,
+    &quot;totalCount&quot;: 0,
+    &quot;hasMore&quot;: true,
+    &quot;pageSize&quot;: 0,
+    &quot;itemsCount&quot;: 0
+  },
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--search-events">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/search-events</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Search for Events using V2 optimized query</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>accept-language</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>keyword</code></td><td>query</td><td>string</td><td>no</td><td>Search keyword</td></tr>
+<tr><td><code>tags</code></td><td>query</td><td>array</td><td>no</td><td>Tags (pass in slugs). Add more `tags` to query when searching more than one tag, for example: ?tags=tag-a&amp;tags=tag-b. Use `&amp;` (%26) to concat a category slug and a sub-category slug.</td></tr>
+<tr><td><code>categories</code></td><td>query</td><td>array</td><td>no</td><td>Categories (pass in slugs). Add more `categories` to query when searching more than one category, for example: ?categories=category-a&amp;categories=category-b</td></tr>
+<tr><td><code>collections</code></td><td>query</td><td>array</td><td>no</td><td>Collections (pass in slugs). Add more `collections` to query when searching more than one collection, for example: ?collections=collection-a&amp;collections=collection-b</td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td>Filter events by status. `open`: currently open events, `closing-soon`: events whose ends_at date is within 24 hours UTC of current time, `pending-resolution`: events with status &quot;closed&quot; but not yet resolved to any outcome, `closed`: all closed events including those pending resolution, `resolved`: events that have been resolved to an outcome</td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Order By</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;_id&quot;: &quot;string&quot;,
+    &quot;code&quot;: &quot;string&quot;,
+    &quot;ticker&quot;: &quot;string&quot;,
+    &quot;group_id&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;,
+    &quot;description&quot;: &quot;string&quot;,
+    &quot;rules&quot;: &quot;string&quot;,
+    &quot;status&quot;: &quot;string&quot;,
+    &quot;ends_at&quot;: &quot;string&quot;,
+    &quot;match_date&quot;: &quot;string&quot;,
+    &quot;volume&quot;: 0,
+    &quot;participants_count&quot;: 0,
+    &quot;closed_at&quot;: &quot;string&quot;,
+    &quot;category&quot;: {
+      &quot;slug&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;icon&quot;: &quot;string&quot;,
+      &quot;num_events&quot;: 0
+    },
+    &quot;sub_category&quot;: {
+      &quot;slug&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;icon&quot;: &quot;string&quot;,
+      &quot;num_events&quot;: 0
+    },
+    &quot;featured_tag&quot;: {
+      &quot;slug&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;icon&quot;: &quot;string&quot;,
+      &quot;num_events&quot;: 0
+    },
+    &quot;collections&quot;: [
+      {
+        &quot;slug&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;icon&quot;: &quot;...&quot;,
+        &quot;image_url&quot;: &quot;...&quot;,
+        &quot;link&quot;: &quot;...&quot;,
+        &quot;target&quot;: &quot;...&quot;,
+        &quot;num_events&quot;: &quot;...&quot;
+      }
+    ],
+    &quot;tags&quot;: [
+      {
+        &quot;slug&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;icon&quot;: &quot;...&quot;,
+        &quot;num_events&quot;: &quot;...&quot;
+      }
+    ],
+    &quot;outcomes&quot;: [
+      {
+        &quot;_id&quot;: &quot;...&quot;,
+        &quot;code&quot;: &quot;...&quot;,
+        &quot;event_id&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;description&quot;: &quot;...&quot;,
+        &quot;image_url&quot;: &quot;...&quot;,
+        &quot;disabled&quot;: &quot;...&quot;,
+        &quot;trader_info&quot;: &quot;...&quot;,
+        &quot;histories&quot;: &quot;...&quot;,
+        &quot;has_wagered&quot;: &quot;...&quot;,
+        &quot;has_cash_wagered&quot;: &quot;...&quot;,
+        &quot;has_leveraged_wagered&quot;: &quot;...&quot;
+      }
+    ],
+    &quot;top_event_images_url&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;event_images_url&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;og_image_url&quot;: &quot;string&quot;,
+    &quot;stream_url&quot;: &quot;string&quot;,
+    &quot;is_top_events&quot;: true,
+    &quot;is_featured_events&quot;: true,
+    &quot;recommended_images_url&quot;: [
+      &quot;string&quot;
+    ]
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--event-groups--slug-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/event-groups/{slug}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get an EventGroup by slug with its associated events. Returns data suitable for og:tags.</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>slug</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>EventGroup slug</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;_id&quot;: &quot;string&quot;,
+    &quot;code&quot;: &quot;string&quot;,
+    &quot;slug&quot;: &quot;string&quot;,
+    &quot;group_type&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;,
+    &quot;description&quot;: &quot;string&quot;,
+    &quot;rules&quot;: &quot;string&quot;,
+    &quot;image_url&quot;: &quot;string&quot;,
+    &quot;banner_image_url&quot;: &quot;string&quot;,
+    &quot;og_image_url&quot;: &quot;string&quot;,
+    &quot;stream_url&quot;: &quot;string&quot;,
+    &quot;status&quot;: &quot;string&quot;,
+    &quot;is_featured&quot;: true,
+    &quot;starts_at&quot;: &quot;string&quot;,
+    &quot;ends_at&quot;: &quot;string&quot;,
+    &quot;match_date&quot;: &quot;string&quot;,
+    &quot;timezone&quot;: &quot;string&quot;,
+    &quot;trading_gate_open&quot;: true,
+    &quot;events&quot;: [
+      {
+        &quot;_id&quot;: &quot;...&quot;,
+        &quot;code&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;status&quot;: &quot;...&quot;,
+        &quot;visible&quot;: &quot;...&quot;,
+        &quot;ends_at&quot;: &quot;...&quot;,
+        &quot;match_date&quot;: &quot;...&quot;
+      }
+    ]
+  },
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events-match-event-calendar">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/match-event-calendar</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get events grouped by match_date, returning event codes, count per date, and total count. By default, excludes created events and only includes visible events unless status parameter is specified.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>accept-language</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td>Filter events by status</td></tr>
+<tr><td><code>category</code></td><td>query</td><td>string</td><td>no</td><td>Category slug to filter events</td></tr>
+<tr><td><code>start_date</code></td><td>query</td><td>string</td><td>no</td><td>Start date for filtering events (inclusive)</td></tr>
+<tr><td><code>end_date</code></td><td>query</td><td>string</td><td>no</td><td>End date for filtering events (inclusive)</td></tr>
+<tr><td><code>timezone</code></td><td>query</td><td>string</td><td>no</td><td>Timezone for date formatting</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;match_date&quot;: &quot;string&quot;,
+      &quot;events&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;count&quot;: 0
+    }
+  ],
+  &quot;total&quot;: 0
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events-v2">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/v2</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List events with DB-level sorting and real 24h volume tracking. Uses event_metrics_snapshots for accurate volume data.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>accept-language</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>keyword</code></td><td>query</td><td>string</td><td>no</td><td>Search keyword</td></tr>
+<tr><td><code>tags</code></td><td>query</td><td>string</td><td>no</td><td>Tag slug</td></tr>
+<tr><td><code>categories</code></td><td>query</td><td>string</td><td>no</td><td>Category slug</td></tr>
+<tr><td><code>collections</code></td><td>query</td><td>string</td><td>no</td><td>Collection slug</td></tr>
+<tr><td><code>purpose</code></td><td>query</td><td>string</td><td>no</td><td>Purpose for the event listing. `top`: lists all top events. `featured` lists all featured events. `regular` lists out all non-top and non-featured events. `recommended` lists all events available.</td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td>Filter events by status. `open`: currently open events, `closing-soon`: events whose ends_at date is within 24 hours UTC of current time, `pending-resolution`: events with status &quot;closed&quot; or &quot;resolving&quot; but not yet resolved to any outcome, `resolved`: events that have been resolved to an outcome, `cancelled`: events that have been cancelled</td></tr>
+<tr><td><code>has_stream_url</code></td><td>query</td><td>boolean</td><td>no</td><td>Filter events that have a stream URL</td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Order By</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>match_date</code></td><td>query</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>timezone</code></td><td>query</td><td>string</td><td>no</td><td>Timezone for match_date filtering (e.g., 'America/New_York', 'Asia/Tokyo'). Defaults to UTC.</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;_id&quot;: &quot;string&quot;,
+      &quot;code&quot;: &quot;string&quot;,
+      &quot;ticker&quot;: &quot;string&quot;,
+      &quot;group_id&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;string&quot;,
+      &quot;rules&quot;: &quot;string&quot;,
+      &quot;status&quot;: &quot;string&quot;,
+      &quot;ends_at&quot;: &quot;string&quot;,
+      &quot;match_date&quot;: &quot;string&quot;,
+      &quot;volume&quot;: 0,
+      &quot;participants_count&quot;: 0,
+      &quot;closed_at&quot;: &quot;string&quot;,
+      &quot;category&quot;: {
+        &quot;slug&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;icon&quot;: &quot;...&quot;,
+        &quot;num_events&quot;: &quot;...&quot;
+      },
+      &quot;sub_category&quot;: {
+        &quot;slug&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;icon&quot;: &quot;...&quot;,
+        &quot;num_events&quot;: &quot;...&quot;
+      },
+      &quot;featured_tag&quot;: {
+        &quot;slug&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;icon&quot;: &quot;...&quot;,
+        &quot;num_events&quot;: &quot;...&quot;
+      },
+      &quot;collections&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;tags&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;outcomes&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;top_event_images_url&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;event_images_url&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;og_image_url&quot;: &quot;string&quot;,
+      &quot;stream_url&quot;: &quot;string&quot;,
+      &quot;is_top_events&quot;: true,
+      &quot;is_featured_events&quot;: true,
+      &quot;recommended_images_url&quot;: [
+        &quot;...&quot;
+      ]
+    }
+  ],
+  &quot;tagData&quot;: [
+    &quot;string&quot;
+  ],
+  &quot;pagination&quot;: {
+    &quot;currentPage&quot;: 0,
+    &quot;totalPages&quot;: 0,
+    &quot;totalCount&quot;: 0,
+    &quot;hasMore&quot;: true,
+    &quot;pageSize&quot;: 0,
+    &quot;itemsCount&quot;: 0
+  },
+  &quot;meta&quot;: {
+    &quot;ts&quot;: &quot;string&quot;,
+    &quot;exec_time&quot;: 0,
+    &quot;request_id&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Public event details with outcomes and trading info</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--user-favourite">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/user/favourite</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Retrieve a list of the user's favorite events with event details</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>keyword</code></td><td>query</td><td>string</td><td>no</td><td>Search keyword for the event listing</td></tr>
+<tr><td><code>tags</code></td><td>query</td><td>string</td><td>no</td><td>Search by tag(s). Use comma to separate multiple tags.</td></tr>
+<tr><td><code>purpose</code></td><td>query</td><td>string</td><td>no</td><td>Purpose for the event listing. `top`: lists all top events. `featured` lists all featured events. `regular` lists out all non-top and non-featured events. `recommended` lists all events available.</td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td>Filter events by status. `open`: currently open events, `closing-soon`: events whose ends_at date is within 24 hours UTC of current time, `pending-resolution`: events with status &quot;closed&quot; or &quot;resolving&quot; but not yet resolved to any outcome, `resolved`: events that have been resolved to an outcome, `cancelled`: events that have been cancelled</td></tr>
+<tr><td><code>has_stream_url</code></td><td>query</td><td>boolean</td><td>no</td><td>Filter events that have a stream URL</td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Order By</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>format</code></td><td>query</td><td>string</td><td>no</td><td>Response format: full (default) or ids (only event codes)</td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id--recent-wagers">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}/recent-wagers</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Event All Outcomes Recent Wagers</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_outcome_id&quot;: &quot;string&quot;,
+    &quot;datetime&quot;: &quot;string&quot;,
+    &quot;probability&quot;: 0,
+    &quot;wager&quot;: 0,
+    &quot;pledge&quot;: 0,
+    &quot;leverage&quot;: 0,
+    &quot;expected_payout&quot;: 0,
+    &quot;user_email&quot;: &quot;string&quot;
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--eventId--comments">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{eventId}/comments</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List all comments for a specific event</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>accept-language</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>eventId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Event ID</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Sort comments by creation time</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;user_id&quot;: &quot;string&quot;,
+    &quot;display_name&quot;: &quot;string&quot;,
+    &quot;content&quot;: &quot;string&quot;,
+    &quot;timestamp&quot;: &quot;2024-01-01T00:00:00Z&quot;,
+    &quot;eventId&quot;: &quot;string&quot;
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--events--eventId--comments">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/events/{eventId}/comments</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Create a new comment for a specific event</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>accept-language</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>eventId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Event ID</td></tr>
+<tr><td><code>content</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Comment content</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;content&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;id&quot;: &quot;string&quot;,
+  &quot;user_id&quot;: &quot;string&quot;,
+  &quot;display_name&quot;: &quot;string&quot;,
+  &quot;content&quot;: &quot;string&quot;,
+  &quot;timestamp&quot;: &quot;2024-01-01T00:00:00Z&quot;,
+  &quot;eventId&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id--history">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}/history</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Event Outcomes Market History of Probability, Estimated Payout and Wagers. Supports precision filtering (1hour, 6hour, 1day, 1week, 1month, all) to get consistent data points for each outcome.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>focused_event_outcome_id</code></td><td>query</td><td>string</td><td>no</td><td>To request for a focused event outcome histories. The response data points would contain two invisible outcomes (`MIN` and `MAX`), representing two range lines.</td></tr>
+<tr><td><code>precision</code></td><td>query</td><td>string</td><td><strong>yes</strong></td><td>Precision for datapoints. 1hour=60 points (1min intervals), 6hour=360 points (1min intervals), 1day=288 points (5min intervals), 1week=84 points (30min intervals), 1month=8*days points (3hour intervals), all=adaptive intervals</td></tr>
+<tr><td><code>_clear_cache</code></td><td>query</td><td>boolean</td><td>no</td><td>Set to true to clear Redis cache for this event before fetching data</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;history&quot;: [
+    {
+      &quot;t&quot;: 0,
+      &quot;p&quot;: 0
+    }
+  ],
+  &quot;metadata&quot;: {
+    &quot;filter&quot;: &quot;string&quot;,
+    &quot;dataPoints&quot;: 0,
+    &quot;interval&quot;: &quot;string&quot;,
+    &quot;from&quot;: &quot;string&quot;,
+    &quot;to&quot;: &quot;string&quot;
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id--related-events">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}/related-events</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get events that share tags with the given event. Uses optimized V2 query.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>accept-language</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Order By</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr>
+<tr><td><code>format</code></td><td>query</td><td>string</td><td>no</td><td>Response format: full (default) or ids (only event codes)</td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--user-favourite-event-ids">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/user/favourite/event-ids</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List Favorite Event IDs</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--user-favourite--event-id-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/user/favourite/{event_id}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Add an event to the user’s favorite list</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>ID of the event to add to favorites</td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="delete--user-favourite--event-id-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-delete">DELETE</span>
+                        <span class="path">/user/favourite/{event_id}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Remove an event from the user’s favorite list</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>ID of the event to remove from favorites</td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--eventId--comments--commentId-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{eventId}/comments/{commentId}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Retrieve a specific comment for an event by its ID</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>eventId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Event ID</td></tr>
+<tr><td><code>commentId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Comment ID</td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;id&quot;: &quot;string&quot;,
+  &quot;user_id&quot;: &quot;string&quot;,
+  &quot;display_name&quot;: &quot;string&quot;,
+  &quot;content&quot;: &quot;string&quot;,
+  &quot;timestamp&quot;: &quot;2024-01-01T00:00:00Z&quot;,
+  &quot;eventId&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="delete--events--eventId--comments--commentId-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-delete">DELETE</span>
+                        <span class="path">/events/{eventId}/comments/{commentId}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Delete a specific comment for an event</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>eventId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Event ID</td></tr>
+<tr><td><code>commentId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Comment ID</td></tr></tbody>
+                    </table>
+                        
+                        
+                    </div>
+                </div>
+
+                <div class="endpoint" id="put--events--eventId--comments--commentId-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-put">PUT</span>
+                        <span class="path">/events/{eventId}/comments/{commentId}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Update a specific comment for an event</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>eventId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Event ID</td></tr>
+<tr><td><code>commentId</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td>Comment ID</td></tr>
+<tr><td><code>content</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Comment content</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;content&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;id&quot;: &quot;string&quot;,
+  &quot;user_id&quot;: &quot;string&quot;,
+  &quot;display_name&quot;: &quot;string&quot;,
+  &quot;content&quot;: &quot;string&quot;,
+  &quot;timestamp&quot;: &quot;2024-01-01T00:00:00Z&quot;,
+  &quot;eventId&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id--outcomes--event-outcome-id--recent-wagers">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}/outcomes/{event_outcome_id}/recent-wagers</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Event Outcome Recent Wagers</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_outcome_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_outcome_id&quot;: &quot;string&quot;,
+    &quot;datetime&quot;: &quot;string&quot;,
+    &quot;probability&quot;: 0,
+    &quot;wager&quot;: 0,
+    &quot;pledge&quot;: 0,
+    &quot;leverage&quot;: 0,
+    &quot;expected_payout&quot;: 0,
+    &quot;user_email&quot;: &quot;string&quot;
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id--outcomes--event-outcome-id--history">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}/outcomes/{event_outcome_id}/history</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Event Outcome Market History of Probability, Estimated Payout and Wagers</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_outcome_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>precision</code></td><td>query</td><td>string</td><td><strong>yes</strong></td><td>Precision for datapoints</td></tr>
+<tr><td><code>from</code></td><td>query</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>to</code></td><td>query</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_outcome_id&quot;: &quot;string&quot;,
+    &quot;datetime&quot;: &quot;string&quot;,
+    &quot;probability&quot;: 0,
+    &quot;estimated_payout&quot;: 0,
+    &quot;indicative_return&quot;: 0,
+    &quot;num_wagers&quot;: 0,
+    &quot;sum_wagers&quot;: 0
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--events--event-id--outcomes--event-outcome-id--wagers-by-probability">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/events/{event_id}/outcomes/{event_outcome_id}/wagers-by-probability</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Event Outcome Market Wager Summary by Probability</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td>no</td><td></td></tr>
+<tr><td><code>event_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>event_outcome_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_outcome_id&quot;: &quot;string&quot;,
+    &quot;probability&quot;: 0,
+    &quot;num_wagers&quot;: 0
+  }
+]</code></pre>
+                    </div>
+                </div></section>
+<section id="dashboard"><h2>Dashboard</h2>
+                <div class="endpoint" id="get--activities">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/activities</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List Activities of the current login User</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;_id&quot;: &quot;string&quot;,
+    &quot;datetime&quot;: &quot;string&quot;,
+    &quot;user_id&quot;: &quot;string&quot;,
+    &quot;activity&quot;: &quot;string&quot;,
+    &quot;target&quot;: &quot;string&quot;,
+    &quot;admin_id&quot;: &quot;string&quot;
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--dashboard">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/dashboard</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">User Dashboard Stats</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;user_id&quot;: &quot;string&quot;,
+  &quot;positions&quot;: 0,
+  &quot;fund_available&quot;: 0,
+  &quot;profit&quot;: 0,
+  &quot;best_case_payoff&quot;: 0,
+  &quot;best_case_cumulative_profit&quot;: 0,
+  &quot;expected_payoff&quot;: 0,
+  &quot;withdrawable_balance&quot;: 0,
+  &quot;topup_balance&quot;: 0,
+  &quot;bonus_balance&quot;: 0,
+  &quot;profit_balance&quot;: 0,
+  &quot;timestamp&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--dashboard-wager-position-events">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/dashboard/wager-position-events</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List Current User Trader Positions in Events</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td>Status filter</td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Order By. `most recently traded` and `time to expiration` are applicable to open positions. `recently closed` is applicable to closed positions.</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;type&quot;: &quot;string&quot;,
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;trader_id&quot;: &quot;string&quot;,
+    &quot;user_id&quot;: &quot;string&quot;,
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_status&quot;: &quot;string&quot;,
+    &quot;event_images_url&quot;: [
+      &quot;string&quot;
+    ],
+    &quot;event&quot;: {
+      &quot;_id&quot;: &quot;string&quot;,
+      &quot;code&quot;: &quot;string&quot;,
+      &quot;ticker&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;string&quot;,
+      &quot;ends_at&quot;: &quot;string&quot;,
+      &quot;closed_at&quot;: &quot;string&quot;,
+      &quot;status&quot;: &quot;string&quot;,
+      &quot;resolved_outcome_id&quot;: &quot;string&quot;,
+      &quot;outcomes&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;event_images_url&quot;: [
+        &quot;...&quot;
+      ]
+    },
+    &quot;wagered_at&quot;: &quot;string&quot;,
+    &quot;pledge&quot;: 0,
+    &quot;is_leveraged&quot;: true,
+    &quot;wager&quot;: 0,
+    &quot;indicative_return&quot;: 0,
+    &quot;indicative_payout&quot;: 0,
+    &quot;unrealized_pnl&quot;: 0,
+    &quot;indicative_pnl&quot;: 0,
+    &quot;payout_return_for_new_wagers&quot;: 0,
+    &quot;probability&quot;: 0,
+    &quot;stop_probability&quot;: 0,
+    &quot;realized_return&quot;: 0,
+    &quot;realized_payout&quot;: 0,
+    &quot;realized_payoff&quot;: 0,
+    &quot;realized_pnl&quot;: 0,
+    &quot;final_indicative_return&quot;: 0,
+    &quot;fill_count&quot;: 0,
+    &quot;entry_probability&quot;: 0,
+    &quot;current_probability&quot;: 0,
+    &quot;probability_change&quot;: 0,
+    &quot;created_at&quot;: &quot;string&quot;,
+    &quot;last_update_time&quot;: &quot;string&quot;,
+    &quot;last_reason&quot;: &quot;string&quot;,
+    &quot;positions&quot;: [
+      {
+        &quot;type&quot;: &quot;...&quot;,
+        &quot;id&quot;: &quot;...&quot;,
+        &quot;trader_id&quot;: &quot;...&quot;,
+        &quot;user_id&quot;: &quot;...&quot;,
+        &quot;event_id&quot;: &quot;...&quot;,
+        &quot;event_status&quot;: &quot;...&quot;,
+        &quot;event_outcome_id&quot;: &quot;...&quot;,
+        &quot;event&quot;: &quot;...&quot;,
+        &quot;event_outcome&quot;: &quot;...&quot;,
+        &quot;wagered_at&quot;: &quot;...&quot;,
+        &quot;pledge&quot;: &quot;...&quot;,
+        &quot;is_leveraged&quot;: &quot;...&quot;,
+        &quot;leverage&quot;: &quot;...&quot;,
+        &quot;wager&quot;: &quot;...&quot;,
+        &quot;indicative_return&quot;: &quot;...&quot;,
+        &quot;indicative_payout&quot;: &quot;...&quot;,
+        &quot;unrealized_pnl&quot;: &quot;...&quot;,
+        &quot;indicative_pnl&quot;: &quot;...&quot;,
+        &quot;payout_return_for_new_wagers&quot;: &quot;...&quot;,
+        &quot;probability&quot;: &quot;...&quot;,
+        &quot;stop_probability&quot;: &quot;...&quot;,
+        &quot;realized_return&quot;: &quot;...&quot;,
+        &quot;realized_payout&quot;: &quot;...&quot;,
+        &quot;realized_payoff&quot;: &quot;...&quot;,
+        &quot;realized_pnl&quot;: &quot;...&quot;,
+        &quot;final_indicative_return&quot;: &quot;...&quot;,
+        &quot;fill_count&quot;: &quot;...&quot;,
+        &quot;entry_probability&quot;: &quot;...&quot;,
+        &quot;current_probability&quot;: &quot;...&quot;,
+        &quot;probability_change&quot;: &quot;...&quot;,
+        &quot;created_at&quot;: &quot;...&quot;,
+        &quot;last_update_time&quot;: &quot;...&quot;,
+        &quot;last_reason&quot;: &quot;...&quot;,
+        &quot;status&quot;: &quot;...&quot;,
+        &quot;stop_warning&quot;: &quot;...&quot;,
+        &quot;stop_distance&quot;: &quot;...&quot;,
+        &quot;wager_position_id&quot;: &quot;...&quot;,
+        &quot;wager_id&quot;: &quot;...&quot;
+      }
+    ]
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--dashboard-wager-positions">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/dashboard/wager-positions</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">List Current User Trader Positions</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>status</code></td><td>query</td><td>string</td><td>no</td><td>Status filter</td></tr>
+<tr><td><code>sortby</code></td><td>query</td><td>string</td><td>no</td><td>Order By. `most recently traded` and `time to expiration` are applicable to open positions. `recently closed` is applicable to closed positions.</td></tr>
+<tr><td><code>limit</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>page</code></td><td>query</td><td>integer</td><td>no</td><td></td></tr>
+<tr><td><code>pagination</code></td><td>query</td><td>boolean</td><td>no</td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">[
+  {
+    &quot;type&quot;: &quot;string&quot;,
+    &quot;id&quot;: &quot;string&quot;,
+    &quot;trader_id&quot;: &quot;string&quot;,
+    &quot;user_id&quot;: &quot;string&quot;,
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;event_status&quot;: &quot;string&quot;,
+    &quot;event_outcome_id&quot;: &quot;string&quot;,
+    &quot;event&quot;: {
+      &quot;_id&quot;: &quot;string&quot;,
+      &quot;code&quot;: &quot;string&quot;,
+      &quot;ticker&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;string&quot;,
+      &quot;ends_at&quot;: &quot;string&quot;,
+      &quot;closed_at&quot;: &quot;string&quot;,
+      &quot;status&quot;: &quot;string&quot;,
+      &quot;resolved_outcome_id&quot;: &quot;string&quot;,
+      &quot;outcomes&quot;: [
+        &quot;...&quot;
+      ],
+      &quot;event_images_url&quot;: [
+        &quot;...&quot;
+      ]
+    },
+    &quot;event_outcome&quot;: {
+      &quot;_id&quot;: &quot;string&quot;,
+      &quot;code&quot;: &quot;string&quot;,
+      &quot;index&quot;: 0,
+      &quot;event_id&quot;: &quot;string&quot;,
+      &quot;name&quot;: &quot;string&quot;,
+      &quot;description&quot;: &quot;string&quot;
+    },
+    &quot;wagered_at&quot;: &quot;string&quot;,
+    &quot;pledge&quot;: 0,
+    &quot;is_leveraged&quot;: true,
+    &quot;leverage&quot;: 0,
+    &quot;wager&quot;: 0,
+    &quot;indicative_return&quot;: 0,
+    &quot;indicative_payout&quot;: 0,
+    &quot;unrealized_pnl&quot;: 0,
+    &quot;indicative_pnl&quot;: 0,
+    &quot;payout_return_for_new_wagers&quot;: 0,
+    &quot;probability&quot;: 0,
+    &quot;stop_probability&quot;: 0,
+    &quot;realized_return&quot;: 0,
+    &quot;realized_payout&quot;: 0,
+    &quot;realized_payoff&quot;: 0,
+    &quot;realized_pnl&quot;: 0,
+    &quot;final_indicative_return&quot;: 0,
+    &quot;fill_count&quot;: 0,
+    &quot;entry_probability&quot;: 0,
+    &quot;current_probability&quot;: 0,
+    &quot;probability_change&quot;: 0,
+    &quot;created_at&quot;: &quot;string&quot;,
+    &quot;last_update_time&quot;: &quot;string&quot;,
+    &quot;last_reason&quot;: &quot;string&quot;,
+    &quot;status&quot;: 0,
+    &quot;stop_warning&quot;: true,
+    &quot;stop_distance&quot;: 0,
+    &quot;wager_position_id&quot;: &quot;string&quot;,
+    &quot;wager_id&quot;: &quot;string&quot;
+  }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="get--dashboard-wager-positions--wager-position-id-">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/dashboard/wager-positions/{wager_position_id}</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Get Current User Trader Position</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>wager_position_id</code></td><td>path</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;type&quot;: &quot;string&quot;,
+  &quot;id&quot;: &quot;string&quot;,
+  &quot;trader_id&quot;: &quot;string&quot;,
+  &quot;user_id&quot;: &quot;string&quot;,
+  &quot;event_id&quot;: &quot;string&quot;,
+  &quot;event_status&quot;: &quot;string&quot;,
+  &quot;event_outcome_id&quot;: &quot;string&quot;,
+  &quot;event&quot;: {
+    &quot;_id&quot;: &quot;string&quot;,
+    &quot;code&quot;: &quot;string&quot;,
+    &quot;ticker&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;,
+    &quot;description&quot;: &quot;string&quot;,
+    &quot;ends_at&quot;: &quot;string&quot;,
+    &quot;closed_at&quot;: &quot;string&quot;,
+    &quot;status&quot;: &quot;string&quot;,
+    &quot;resolved_outcome_id&quot;: &quot;string&quot;,
+    &quot;outcomes&quot;: [
+      {
+        &quot;_id&quot;: &quot;...&quot;,
+        &quot;code&quot;: &quot;...&quot;,
+        &quot;event_id&quot;: &quot;...&quot;,
+        &quot;name&quot;: &quot;...&quot;,
+        &quot;description&quot;: &quot;...&quot;,
+        &quot;image_url&quot;: &quot;...&quot;,
+        &quot;disabled&quot;: &quot;...&quot;,
+        &quot;trader_info&quot;: &quot;...&quot;,
+        &quot;histories&quot;: &quot;...&quot;,
+        &quot;has_wagered&quot;: &quot;...&quot;,
+        &quot;has_cash_wagered&quot;: &quot;...&quot;,
+        &quot;has_leveraged_wagered&quot;: &quot;...&quot;
+      }
+    ],
+    &quot;event_images_url&quot;: [
+      &quot;string&quot;
+    ]
+  },
+  &quot;event_outcome&quot;: {
+    &quot;_id&quot;: &quot;string&quot;,
+    &quot;code&quot;: &quot;string&quot;,
+    &quot;index&quot;: 0,
+    &quot;event_id&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;string&quot;,
+    &quot;description&quot;: &quot;string&quot;
+  },
+  &quot;wagered_at&quot;: &quot;string&quot;,
+  &quot;pledge&quot;: 0,
+  &quot;is_leveraged&quot;: true,
+  &quot;leverage&quot;: 0,
+  &quot;wager&quot;: 0,
+  &quot;indicative_return&quot;: 0,
+  &quot;indicative_payout&quot;: 0,
+  &quot;unrealized_pnl&quot;: 0,
+  &quot;indicative_pnl&quot;: 0,
+  &quot;payout_return_for_new_wagers&quot;: 0,
+  &quot;probability&quot;: 0,
+  &quot;stop_probability&quot;: 0,
+  &quot;realized_return&quot;: 0,
+  &quot;realized_payout&quot;: 0,
+  &quot;realized_payoff&quot;: 0,
+  &quot;realized_pnl&quot;: 0,
+  &quot;final_indicative_return&quot;: 0,
+  &quot;fill_count&quot;: 0,
+  &quot;entry_probability&quot;: 0,
+  &quot;current_probability&quot;: 0,
+  &quot;probability_change&quot;: 0,
+  &quot;created_at&quot;: &quot;string&quot;,
+  &quot;last_update_time&quot;: &quot;string&quot;,
+  &quot;last_reason&quot;: &quot;string&quot;,
+  &quot;status&quot;: 0,
+  &quot;stop_warning&quot;: true,
+  &quot;stop_distance&quot;: 0,
+  &quot;wager_position_id&quot;: &quot;string&quot;,
+  &quot;wager_id&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div></section>
+<section id="deposits"><h2>Deposits</h2>
+                <div class="endpoint" id="get--deposit-create-wallet">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-get">GET</span>
+                        <span class="path">/deposit/create/wallet</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Create a new wallet</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;address&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--deposit-create-transaction">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/deposit/create/transaction</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Create a new transaction</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>txnHash</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>amount</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>network</code></td><td>formData</td><td>string</td><td><strong>yes</strong></td><td></td></tr></tbody>
+                    </table>
+                        
+                        <h4>Response 201</h4><pre><code class="language-json">{
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;transaction_hash&quot;: &quot;string&quot;,
+  &quot;network&quot;: &quot;string&quot;,
+  &quot;status&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div></section>
+<section id="withdrawals"><h2>Withdrawals</h2>
+                <div class="endpoint" id="post--withdrawal-preflight">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/withdrawal/preflight</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">Advisory endpoint to check OTP requirements before initiating withdrawal. Checks phone verification status and TTL expiry. Does not block withdrawal API - clients should use this for UX optimization.</p>
+                        <div class="security-badges"><span class="badge badge-auth">JWT Auth</span> <span class="badge badge-conditional">Fingerprint Conditional</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>authorization</code></td><td>header</td><td>string</td><td><strong>yes</strong></td><td></td></tr>
+<tr><td><code>amount</code></td><td>body</td><td>number</td><td>no</td><td>Withdrawal amount (optional, for logging)</td></tr>
+<tr><td><code>network</code></td><td>body</td><td>string</td><td>no</td><td>Network identifier (optional, for logging)</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;amount&quot;: 0,
+  &quot;network&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;otp_required&quot;: true,
+  &quot;verification_method&quot;: &quot;string&quot;,
+  &quot;reason&quot;: &quot;string&quot;,
+  &quot;last_verified_at&quot;: &quot;string&quot;,
+  &quot;verification_expires_at&quot;: &quot;string&quot;,
+  &quot;can_proceed&quot;: true,
+  &quot;message&quot;: &quot;string&quot;
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint" id="post--withdrawal-request">
+                    <div class="endpoint-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                        <span class="method method-post">POST</span>
+                        <span class="path">/withdrawal/request</span>
+                        <span class="chevron">&#9660;</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="description">User can request withdrawal of funds from their wallet using CORATIO-based calculation and sequential wallet deduction</p>
+                        <div class="security-badges"><span class="badge badge-public">Public</span></div>
+                        
+                    <h4>Parameters</h4>
+                    <table class="params-table">
+                        <thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                        <tbody><tr><td><code>amount</code></td><td>body</td><td>number</td><td><strong>yes</strong></td><td>Amount to withdraw</td></tr>
+<tr><td><code>network</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Network type</td></tr>
+<tr><td><code>address</code></td><td>body</td><td>string</td><td><strong>yes</strong></td><td>Withdrawal address</td></tr>
+<tr><td><code>token</code></td><td>body</td><td>string</td><td>no</td><td>Verification token (OTP or TOTP)</td></tr></tbody>
+                    </table>
+                        <h4>Request Body</h4><pre><code class="language-json">{
+  &quot;amount&quot;: 0,
+  &quot;network&quot;: &quot;string&quot;,
+  &quot;address&quot;: &quot;string&quot;,
+  &quot;token&quot;: &quot;string&quot;
+}</code></pre>
+                        <h4>Response 200</h4><pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;message&quot;: &quot;string&quot;,
+  &quot;txnHash&quot;: &quot;string&quot;,
+  &quot;status&quot;: &quot;string&quot;,
+  &quot;transactionIds&quot;: [
+    0
+  ],
+  &quot;pendingWithdrawalId&quot;: 0,
+  &quot;withdrawableBalance&quot;: 0,
+  &quot;breakdown&quot;: {},
+  &quot;deductionBreakdown&quot;: {}
+}</code></pre>
+                    </div>
+                </div></section>
+</main>
+</div>
+<script>
+function filterEndpoints(query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll('.endpoint').forEach(function(el) {
+        const header = el.querySelector('.endpoint-header');
+        const text = header ? header.textContent.toLowerCase() : '';
+        el.style.display = text.includes(q) || !q ? '' : 'none';
+    });
+    document.querySelectorAll('section').forEach(function(section) {
+        var endpoints = section.querySelectorAll('.endpoint');
+        var visible = Array.from(endpoints).some(function(e) { return e.style.display !== 'none'; });
+        section.style.display = visible || !q ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>
